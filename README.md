@@ -1,141 +1,97 @@
 | CS-665       | Software Design & Patterns |
 |--------------|----------------------------|
 | Name         | Zhiling Li                 |
-| Date         | 04/16/2024                 |
+| Date         | 04/25/2024                 |
 | Course       | Spring                     |
-| Assignment # | 5                          |
+| Assignment # | final                      |
 
-## Code Improvement Opportunities and Description of Changes Made
+## Assignment Overview
 
-### Opportunities for Code Improvement
+### Project Purpose
 
-#### 1. **Error Handling and Input Validation**
-##### Opportunity:
-Improve error handling and input validation in the `Main` class to handle cases where non-integer input is provided where integers are expected.
+The primary objective of this project is to demonstrate the application of advanced software design principles and
+patterns in a practical, real-world scenario. The focus is on building a robust data transformation tool that can
+convert data from one format to another, such as CSV to JSON or XML to YAML. This tool is designed to be extensible,
+maintainable, and easy to use, addressing typical challenges faced in software development such as scalability,
+flexibility, and code reusability.
 
-##### Reasoning:
-Robust error handling ensures the application can handle unexpected user inputs gracefully, preventing crashes and improving user experience by providing clear feedback.
+### Project Scope
 
-#### 2. **Implementation of Factory Pattern**
-##### Opportunity:
-Implement a Factory Design Pattern to manage the creation of different types of beverages, thus simplifying the `Main` class.
+The project encompasses the following key functionalities:
 
-##### Reasoning:
-Using the Factory Pattern decouples the construction of objects from the business logic that uses those objects, making the code more modular, easier to extend, and maintain.
+- **Data Transformation**: Core functionality to transform data from one format to another using various algorithms
+  encapsulated in different transformer classes.
+- **Extensibility**: Ability to easily add new data formats and transformation logic without impacting existing
+  functionality.
+- **Error Handling**: Robust error handling to manage and log issues during the data transformation processes.
+- **Testing**: Comprehensive unit tests to ensure reliability and correctness of the transformation logic.
 
-#### 3. **Enhanced Logging and Consistency**
-##### Opportunity:
-Enhance logging for better traceability of actions and ensure consistency in how beverage quantities are managed in the `VendingMachine` class.
+### Approach
 
-##### Reasoning:
-Logging is crucial for diagnosing issues and understanding the application's behavior at any point. Consistent management of beverage quantities ensures predictable application behavior.
+The project leverages several design patterns and best practices in software engineering:
 
-### Description of Changes Made
+- **Factory Method Pattern**: For creating transformer instances, allowing for easy addition of new transformers.
+- **Builder Pattern**: To construct complex transformer configurations in a step-by-step manner.
+- **Singleton Pattern**: Ensured that certain utility classes were instantiated only once, managing shared resources
+  efficiently.
+- **Delegation Pattern**: To delegate specific tasks like encoding conversion and data cleaning to specialized classes,
+  thereby keeping the transformer classes focused on core responsibilities.
 
-#### 1. **Introduction of `BeverageFactory` Class**
-##### Changes Made:
-A new `BeverageFactory` class was introduced to centralize the creation of beverage objects, using a switch statement based on input strings.
+This structured approach not only aids in achieving the project's goals but also serves as a practical demonstration of
+applying theoretical software design concepts in real-world applications.
 
-##### Impact:
-This centralizes beverage creation logic, simplifying future modifications and adhering to the Open/Closed Principle by isolating changes to the factory class.
-
-#### 2. **Improved Error Handling and Input Validation in `Main` Class**
-##### Changes Made:
-Enhanced error handling and input validation were implemented to catch and handle incorrect inputs gracefully.
-
-##### Impact:
-These changes prevent application crashes from invalid input and improve user interactions by providing immediate feedback on input errors.
-
-#### 3. **Enhanced Logging and Beverage Management in `VendingMachine` Class**
-##### Changes Made:
-Added detailed logging and centralized the logic for managing beverage quantities in the `VendingMachine`.
-
-##### Impact:
-Improves monitoring and troubleshooting capabilities while ensuring consistent behavior across the application's inventory management.
-
-#### 4. **Unit Tests Development**
-##### Changes Made:
-Developed comprehensive unit tests to validate the functionalities of the new `BeverageFactory`, improved `Main`, and `VendingMachine` classes.
-
-##### Impact:
-Ensures that all parts of the application perform as expected under various conditions, supporting high quality and functionality as the system evolves.
-
-### Conclusion
-These improvements significantly enhance the structure, reliability, and user experience of the application. By focusing on robust design patterns, reliable error handling, effective logging, and thorough testing, the application is now well-prepared for future extensions and maintenance.
-
-
-# Assignment Overview
-
-The primary objective of this assignment was to design and implement a software application capable of controlling a
-fully automated beverage vending machine. The challenge was to create a versatile system that not only facilitates the
-selection and dispensing of various types of beverages, including coffee and tea, but also allows for the customization
-of these beverages with condiments such as milk and sugar. A significant emphasis was placed on applying sound software
-design principles to ensure the application's flexibility, maintainability, and ease of use.
-
-To achieve these goals, I employed object-oriented programming techniques, focusing on abstraction, inheritance, and
-polymorphism, to create a scalable and extensible architecture. The application was designed to be open to future
-expansions, such as the introduction of new beverage types or condiments, without necessitating substantial
-modifications to the existing codebase. Furthermore, the project involved developing a suite of unit tests to rigorously
-verify the functionality of the system under various scenarios, ensuring reliability and robustness. Through this
-assignment, I aimed to demonstrate a thorough understanding of software design patterns and principles, as well as my
-ability to apply these concepts in a practical, real-world application.
 
 # GitHub Repository Link:
 
-https://github.com/kanfeng9/cs-665-assignment-5
+https://github.com/kanfeng9/CS665-Class-project
 
-# Implementation Description
-
-## Overview
-
-This document outlines the design and implementation strategies I employed in developing the Automated Beverage Vending
-Machine application. The application supports a variety of beverages, including coffee and tea, and enables users to
-customize their drinks with condiments.
-
-## Design Principles
+## Implementation Description
 
 ### Flexibility
 
-In my implementation, I leveraged **inheritance** and **polymorphism** to facilitate the easy introduction of new
-beverage types. By creating a base `Beverage` class from which `Coffee` and `Tea` classes are derived, I ensured that
-adding a new drink type, such as `Latte`, is as straightforward as extending `Coffee` and providing implementations for
-any abstract methods like `getBrewTime()`. This design adheres to the **Open/Closed Principle**, allowing the system to
-be open for extension but closed for modification.
+The implementation of this application emphasizes flexibility through the use of design patterns that allow for easy
+extension and modification of code. For instance, the **Factory Method** pattern is utilized within
+the `TransformerFactory` to facilitate the addition or removal of new transformer types without altering existing code.
+This makes it straightforward to integrate new data formats or transformation techniques as the application evolves.
 
 ### Simplicity and Understandability
 
-I organized the application into distinct, focused classes, each responsible for a specific aspect of the system's
-functionality. The `VendingMachine` class manages beverage dispensing and inventory, while `Beverage` and its subclasses
-concentrate on beverage-specific details. Through descriptive naming conventions and comprehensive comments, I aimed to
-enhance the readability and maintainability of the codebase.
+To ensure that the application is easy to understand and maintain, the codebase is structured around clear and simple
+design principles:
 
-### DRY Principle (Don't Repeat Yourself)
+- **Single Responsibility Principle (SRP)**: Each class and method has a single responsibility and is independent of the
+  complexities of other features. For example, `CSVToJsonTransformer` focuses solely on converting CSV data to JSON
+  format, devoid of any additional logic.
+- **Modular Design**: The application is divided into modules such as transformers, utilities, and delegates. This
+  separation enhances readability and maintainability by isolating specific functionalities.
 
-To minimize code duplication, I utilized abstract classes and inheritance. Shared properties and behaviors are
-encapsulated in the `Beverage` class and inherited by `Coffee`, `Tea`, and any other beverage subclasses. This approach
-promotes code reuse and simplifies updates to shared functionalities across beverages.
+### Avoiding Duplicated Code
 
-### Design Patterns
+Duplicated code has been meticulously avoided by:
 
-- **Abstract Factory Pattern** (Conceptual): Although not explicitly implemented, the setup of my beverage creation
-  logic aligns with the Abstract Factory Pattern. This pattern would facilitate the instantiation of various beverage
-  types through a single interface, further decoupling system components and enhancing scalability.
+- **Using Abstract Classes and Interfaces**: Common functionalities are abstracted into interfaces or base classes. For
+  example, all transformers implement the `DataTransformer` interface, which standardizes the transformation process and
+  reduces code repetition.
+- **Utility Classes**: Shared methods, such as file operations and configuration loading, are centralized in utility
+  classes (`FileUtil` and `ConfigLoader`), ensuring that these methods are written once and reused throughout the
+  application.
 
-## Challenges and Solutions
+### Use of Design Patterns
 
-- **Condiment Management**: Implementing the functionality to allow condiment additions while enforcing limits was
-  challenging. I addressed this by integrating a method in the `Beverage` class for managing condiments, ensuring that
-  additions stay within the predefined limits.
+Several design patterns have been employed to address specific challenges:
 
-- **Testing**: Developing comprehensive tests to cover a range of scenarios, including condiment additions and beverage
-  retrieval, required thoughtful consideration. My testing strategy focused on verifying the application's behavior
-  under normal conditions and edge cases, such as exceeding condiment limits.
+- **Factory Method Pattern**: Used in `TransformerFactory` to create instances of transformers, enabling the decoupling
+  of object creation from its usage.
+- **Builder Pattern**: Implemented in `TransformerBuilder` to provide a flexible solution to various object creation
+  scenarios in the transformers.
+- **Singleton Pattern**: Applied in utility classes to ensure that only a single instance of a class is created,
+  providing a controlled access point to resources, such as configuration settings.
+- **Decorator Pattern**: Although not used in the current implementation, this pattern was considered for potential
+  future enhancements to add additional behaviors to transformers without modifying their code.
 
-## Conclusion
+These patterns were chosen not only for their technical benefits but also to facilitate a deeper understanding of good
+design practices and their impact on maintainability and scalability.
 
-The Automated Beverage Vending Machine application is designed with principles of flexibility, simplicity, and
-maintainability at its core. By employing key software design principles and considering future extension possibilities,
-I've created a robust and user-friendly system ready to adapt to new requirements or beverage types.
 
 # Maven Commands
 
