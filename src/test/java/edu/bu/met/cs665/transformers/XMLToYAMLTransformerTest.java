@@ -2,70 +2,89 @@ package edu.bu.met.cs665.transformers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Name: Zhiling Li
  * Course: CS-665 Software Designs & Patterns
- * Date: 04/22/2024
+ * Date: 04/24/2024
  * File Name: XMLToYAMLTransformerTest.java
- * Description: This class tests the XMLToYAMLTransformer to ensure it correctly converts XML data into YAML format.
+ * Description: This class tests the XMLToYAMLTransformer to ensure it correctly converts XML data into YAML format,
+ * handling file inputs and outputs, and covering various scenarios including complex XML structures and malformed inputs.
  */
 public class XMLToYAMLTransformerTest {
 
-    private static final Logger logger = LogManager.getLogger(XMLToYAMLTransformerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(XMLToYAMLTransformerTest.class);
     private XMLToYAMLTransformer transformer;
+
+    @TempDir
+    Path tempDir;
 
     @BeforeEach
     public void setUp() {
         transformer = new XMLToYAMLTransformer();
-        logger.info("XMLToYAMLTransformer initialized for testing.");
     }
 
     @Test
-    public void testTransform_simpleXML_correctYaml() {
+    public void testTransform_simpleXML_correctYaml() throws Exception {
+        Path inputPath = tempDir.resolve("simple.xml");
+        Path outputPath = tempDir.resolve("output.yaml");
         String xml = "<person><name>Alice</name><age>30</age></person>";
-        String expectedYaml = "person:\n  name: Alice\n  age: '30'\n";
-        try {
-            String actualYaml = transformer.transform(xml);
-            assertEquals(expectedYaml, actualYaml, "The YAML output should match the expected simple YAML format.");
-            logger.info("testTransform_simpleXML_correctYaml passed successfully.");
-        } catch (Exception e) {
-            logger.error("Failure in testTransform_simpleXML_correctYaml", e);
-            fail("Unexpected error during test: " + e.getMessage());
-        }
+        Files.writeString(inputPath, xml);
+
+        transformer.transform(inputPath.toString(), outputPath.toString());
+
+        String actualYaml = Files.readString(outputPath).trim();
+        String expectedYaml = "person:\n  name: Alice\n  age: '30'";
+        assertEquals(expectedYaml, actualYaml, "The YAML output should match the expected simple YAML format.");
     }
 
     @Test
-    public void testTransform_emptyXML_emptyYaml() {
-        String xml = "";
-        String expectedYaml = "{}\n"; // Expecting an empty YAML object
-        try {
-            String actualYaml = transformer.transform(xml);
-            assertEquals(expectedYaml, actualYaml, "An empty XML should result in an empty YAML object.");
-            logger.info("testTransform_emptyXML_emptyYaml passed successfully.");
-        } catch (Exception e) {
-            logger.error("Failure in testTransform_emptyXML_emptyYaml", e);
-            fail("Unexpected error during test: " + e.getMessage());
-        }
+    public void testTransform_withAttributes_ignoresAttributes() throws Exception {
+        Path inputPath = tempDir.resolve("withAttributes.xml");
+        Path outputPath = tempDir.resolve("output.yaml");
+        String xml = "<person age='30'><name>Alice</name></person>";
+        Files.writeString(inputPath, xml);
+
+        transformer.transform(inputPath.toString(), outputPath.toString());
+
+        String actualYaml = Files.readString(outputPath).trim();
+        String expectedYaml = "person:\n  name: Alice";
+        assertEquals(expectedYaml, actualYaml, "The YAML output should ignore XML attributes and correctly represent nested elements.");
     }
 
     @Test
-    public void testTransform_nestedXML_correctYaml() {
-        String xml = "<company><department><name>HR</name><employee>Alice</employee></department></company>";
-        String expectedYaml = "company:\n  department:\n    name: HR\n    employee: Alice\n";
-        try {
-            String actualYaml = transformer.transform(xml);
-            assertEquals(expectedYaml, actualYaml, "The YAML output should correctly represent nested XML elements.");
-            logger.info("testTransform_nestedXML_correctYaml passed successfully.");
-        } catch (Exception e) {
-            logger.error("Failure in testTransform_nestedXML_correctYaml", e);
-            fail("Unexpected error during test: " + e.getMessage());
-        }
+    public void testTransform_deepNestedXML_correctYaml() throws Exception {
+        Path inputPath = tempDir.resolve("deepNested.xml");
+        Path outputPath = tempDir.resolve("output.yaml");
+        String xml = "<company><department><team><member>Alice</member></team></department></company>";
+        Files.writeString(inputPath, xml);
+
+        transformer.transform(inputPath.toString(), outputPath.toString());
+
+        String actualYaml = Files.readString(outputPath).trim();
+        String expectedYaml = "company:\n  department:\n    team:\n      member: Alice";
+        assertEquals(expectedYaml, actualYaml, "The YAML output should correctly represent deeply nested XML elements.");
     }
 
+    @Test
+    public void testTransform_malformedXML_throwsException() {
+        Path inputPath = tempDir.resolve("malformed.xml");
+        String xml = "<person><name>Alice</name><age>30</person>";  // Incorrectly closed tag
+        IOException exception = assertThrows(IOException.class, () -> {
+            Files.writeString(inputPath, xml);
+            transformer.transform(inputPath.toString(), null);
+        }, "Malformed XML should cause an IOException due to error in XML processing.");
+
+        assertTrue(exception.getMessage().contains("元素类型 \"age\" 必须由匹配的结束标记 \"</age>\" 终止"), "Exception message should mention the specific XML error about unmatched tags.");
+    }
 
 }
