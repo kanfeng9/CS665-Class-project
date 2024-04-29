@@ -35,27 +35,31 @@ public class CSVToJsonTransformer implements DataTransformer {
 
     /**
      * Converts CSV data to JSON format.
+     * Assumes the CSV file has a header row.
      *
      * @param csvData String representation of the input CSV data.
      * @return String representation of the JSON formatted data.
+     * @throws IllegalArgumentException if CSV data format is incorrect
      */
     private String convertCSVToJson(String csvData) throws IllegalArgumentException {
-        List<String> lines = Stream.of(csvData.split("\n")).collect(Collectors.toList());
+        List<String> lines = Stream.of(csvData.split("\r?\n")).collect(Collectors.toList());
         if (lines.isEmpty()) throw new IllegalArgumentException("CSV data is empty");
 
-        StringBuilder jsonBuilder = new StringBuilder("[\n");
-        String[] headers = lines.get(0).split(",");
+        String[] headers = lines.get(0).split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+        if (headers.length == 0) throw new IllegalArgumentException("CSV header is missing");
 
+        StringBuilder jsonBuilder = new StringBuilder("[\n");
         for (int i = 1; i < lines.size(); i++) {
-            String[] cells = lines.get(i).split(",");
+            String[] cells = lines.get(i).split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
             if (cells.length != headers.length) {
                 throw new IllegalArgumentException("CSV data format is incorrect: mismatched columns on line " + (i + 1));
             }
 
             jsonBuilder.append("  {");
-            for (int j = 0; j < cells.length; j++) {
-                jsonBuilder.append(String.format("\"%s\": \"%s\"", headers[j], cells[j]));
-                if (j < cells.length - 1) jsonBuilder.append(", ");
+            for (int j = 0; j < headers.length; j++) {
+                String cellValue = cells[j].replaceAll("^\"|\"$", ""); // Remove surrounding quotes if present
+                jsonBuilder.append(String.format("\"%s\": \"%s\"", headers[j], cellValue));
+                if (j < headers.length - 1) jsonBuilder.append(", ");
             }
             jsonBuilder.append("}");
             if (i < lines.size() - 1) jsonBuilder.append(",\n");
@@ -64,6 +68,4 @@ public class CSVToJsonTransformer implements DataTransformer {
         jsonBuilder.append("\n]");
         return jsonBuilder.toString().trim();
     }
-
 }
-// Path: src/main/java/edu/bu/met/cs665/transformers/DataTransformer.java

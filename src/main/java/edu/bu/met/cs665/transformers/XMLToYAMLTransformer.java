@@ -12,7 +12,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -75,22 +77,42 @@ public class XMLToYAMLTransformer implements DataTransformer {
         }
     }
 
-    private void buildMapFromNode(Node node, Map<String, Object> map) {
+    private void buildMapFromNode(Node node, Map<String, Object> dataMap) {
         if (node.getNodeType() == Node.ELEMENT_NODE) {
+            Map<String, Object> childMap = new LinkedHashMap<>();
             NodeList childNodes = node.getChildNodes();
-            if (childNodes.getLength() == 1 && childNodes.item(0).getNodeType() == Node.TEXT_NODE) {
-                map.put(node.getNodeName(), node.getTextContent().trim());
-            } else {
-                Map<String, Object> subMap = new LinkedHashMap<>();
-                for (int i = 0; i < childNodes.getLength(); i++) {
-                    buildMapFromNode(childNodes.item(i), subMap);
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node item = childNodes.item(i);
+                if (item.getNodeType() == Node.ELEMENT_NODE) {
+                    if (item.getChildNodes().getLength() == 1 && item.getFirstChild().getNodeType() == Node.TEXT_NODE) {
+                        childMap.put(item.getNodeName(), item.getTextContent().trim());
+                    } else {
+                        buildMapFromNode(item, childMap);
+                    }
                 }
-                if (!subMap.isEmpty()) {
-                    map.put(node.getNodeName(), subMap);
+            }
+            if (!childMap.isEmpty()) {
+                if (dataMap.containsKey(node.getNodeName())) {
+                    // If this node name already exists in the map, it means we are dealing with a list
+                    Object existingObject = dataMap.get(node.getNodeName());
+                    if (existingObject instanceof List) {
+                        @SuppressWarnings("unchecked")
+                        List<Object> existingList = (List<Object>) existingObject;
+                        existingList.add(childMap);
+                    } else {
+                        // Convert the existing object to a list
+                        List<Object> newList = new ArrayList<>();
+                        newList.add(existingObject);  // Add the previously mapped item
+                        newList.add(childMap);        // Add the new item
+                        dataMap.put(node.getNodeName(), newList);
+                    }
+                } else {
+                    dataMap.put(node.getNodeName(), childMap);
                 }
             }
         }
     }
+
 
     private static class CustomErrorHandler implements ErrorHandler {
         public void warning(SAXParseException e) throws SAXException {
