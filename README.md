@@ -1,96 +1,140 @@
 | CS-665       | Software Design & Patterns |
 |--------------|----------------------------|
 | Name         | Zhiling Li                 |
-| Date         | 04/25/2024                 |
+| Date         | 04/28/2024                 |
 | Course       | Spring                     |
 | Assignment # | final                      |
 
 ## Assignment Overview
 
-### Project Purpose
+## Assignment Overview
 
-The primary objective of this project is to demonstrate the application of advanced software design principles and
-patterns in a practical, real-world scenario. The focus is on building a robust data transformation tool that can
-convert data from one format to another, such as CSV to JSON or XML to YAML. This tool is designed to be extensible,
-maintainable, and easy to use, addressing typical challenges faced in software development such as scalability,
-flexibility, and code reusability.
+This project, part of the CS-665 Software Designs & Patterns curriculum at Boston University, implements a data
+transformation system with a focus on software design patterns. The system provides a means to convert data between
+various formats such as CSV, JSON, XML, and YAML, all through an interactive command-line interface.
 
-### Project Scope
+### Key Features
 
-The project encompasses the following key functionalities:
+- **Multiple Data Formats**: Transform data between popular data formats like CSV, JSON, XML, and YAML.
+- **CLI**: Use the command-line interface for easy interaction with the system, allowing for file specification and
+  transformation selection.
+- **Concurrency Management**: Efficient processing with concurrency support to handle large data transformations.
+- **Extensible Design**: Apply design patterns to allow easy addition of new data formats and features.
 
-- **Data Transformation**: Core functionality to transform data from one format to another using various algorithms
-  encapsulated in different transformer classes.
-- **Extensibility**: Ability to easily add new data formats and transformation logic without impacting existing
-  functionality.
-- **Error Handling**: Robust error handling to manage and log issues during the data transformation processes.
-- **Testing**: Comprehensive unit tests to ensure reliability and correctness of the transformation logic.
+### Modules
 
-### Approach
+The project consists of several key modules:
 
-The project leverages several design patterns and best practices in software engineering:
+- **builder**: Contains the `TransformerBuilder` class for constructing transformer instances.
+- **cli**: Handles the command-line user interface, processing user commands.
+  - `CLI`: The main class for the command-line interface.
+  - `Command`: An interface for command actions.
+  - `ConvertCommand`: Implements the `Command` interface to manage the conversion process.
+- **concurrency**: Manages concurrent data processing.
+  - `DataProcessor`: Processes data using concurrency.
+  - `ThreadPoolManager`: Manages thread pools for concurrent tasks.
+- **delegation**: Utilizes the delegation pattern for specific processing tasks.
+  - `CleaningDelegate`: Handles cleaning aspects of data transformation.
+  - `EncodingDelegate`: Manages encoding during data transformation.
+- **transformers**: Classes that define the transformation logic.
+  - `CSVToJsonTransformer`: Transformer for CSV to JSON conversions.
+  - `DataTransformer`: An interface for all transformers.
+  - `TransformerFactory`: Factory class for creating transformer instances.
+  - `XMLToYAMLTransformer`: Transformer for XML to YAML conversions.
+- **util**: Utility classes for common operations.
+  - `ConfigLoader`: Loads configuration settings.
+  - `FileUtil`: Provides file-related utility functions.
+- **validators**: Validates input data formats.
+  - `CSVValidator`: Validates CSV data format.
+  - `Validator`: An interface for validation logic.
+  - `XMLValidator`: Validates XML data format.
 
-- **Factory Method Pattern**: For creating transformer instances, allowing for easy addition of new transformers.
-- **Builder Pattern**: To construct complex transformer configurations in a step-by-step manner.
-- **Singleton Pattern**: Ensured that certain utility classes were instantiated only once, managing shared resources
-  efficiently.
-- **Delegation Pattern**: To delegate specific tasks like encoding conversion and data cleaning to specialized classes,
-  thereby keeping the transformer classes focused on core responsibilities.
+### Usage
 
-This structured approach not only aids in achieving the project's goals but also serves as a practical demonstration of
-applying theoretical software design concepts in real-world applications.
+To use the system, navigate to the compiled classes' directory and execute:
+
+```bash
+java edu.bu.met.cs665.cli.CLI
+```
 
 
 # GitHub Repository Link:
 
 https://github.com/kanfeng9/CS665-Class-project
-
 ## Implementation Description
 
-### Flexibility
+The Data Transformation System (DTS) is designed with extensibility and maintainability in mind, leveraging various
+design patterns to facilitate these principles.
 
-The implementation of this application emphasizes flexibility through the use of design patterns that allow for easy
-extension and modification of code. For instance, the **Factory Method** pattern is utilized within
-the `TransformerFactory` to facilitate the addition or removal of new transformer types without altering existing code.
-This makes it straightforward to integrate new data formats or transformation techniques as the application evolves.
+### Design Patterns
 
-### Simplicity and Understandability
+- **Factory Pattern**: The `TransformerFactory` class in the `transformers` package abstracts the instantiation of
+  different transformers. This pattern allows the addition of new transformers without modifying existing code, adhering
+  to the open-closed principle.
 
-To ensure that the application is easy to understand and maintain, the codebase is structured around clear and simple
-design principles:
+- **Singleton Pattern**: The `ConfigLoader` class in the `util` package ensures that configuration settings are loaded
+  only once and are accessible globally without redundant I/O operations.
 
-- **Single Responsibility Principle (SRP)**: Each class and method has a single responsibility and is independent of the
-  complexities of other features. For example, `CSVToJsonTransformer` focuses solely on converting CSV data to JSON
-  format, devoid of any additional logic.
-- **Modular Design**: The application is divided into modules such as transformers, utilities, and delegates. This
-  separation enhances readability and maintainability by isolating specific functionalities.
+- **Command Pattern**: The `cli` package utilizes the Command pattern, encapsulating command execution logic in
+  the `ConvertCommand` class, allowing for easy addition of new commands.
 
-### Avoiding Duplicated Code
+- **Strategy Pattern**: Validation logic is abstracted behind the `Validator` interface in the `validators` package.
+  Specific validation strategies like `CSVValidator` and `XMLValidator` implement this interface, making the system
+  adaptable to new data formats.
 
-Duplicated code has been meticulously avoided by:
+- **Builder Pattern**: The `TransformerBuilder` class in the `builder` package provides a step-by-step approach to
+  creating complex transformer objects, making the construction process customizable and clear.
 
-- **Using Abstract Classes and Interfaces**: Common functionalities are abstracted into interfaces or base classes. For
-  example, all transformers implement the `DataTransformer` interface, which standardizes the transformation process and
-  reduces code repetition.
-- **Utility Classes**: Shared methods, such as file operations and configuration loading, are centralized in utility
-  classes (`FileUtil` and `ConfigLoader`), ensuring that these methods are written once and reused throughout the
-  application.
+- **Delegation Pattern**: The `CleaningDelegate` and `EncodingDelegate` classes within the `delegation` package handle
+  specific subtasks of data transformation, following the single responsibility principle.
 
-### Use of Design Patterns
+- **Thread Pool Pattern**: The `ThreadPoolManager` in the `concurrency` package manages a pool of threads to execute
+  data processing tasks concurrently, improving performance for large-scale data transformations.
 
-Several design patterns have been employed to address specific challenges:
+### Project Modules
 
-- **Factory Method Pattern**: Used in `TransformerFactory` to create instances of transformers, enabling the decoupling
-  of object creation from its usage.
-- **Builder Pattern**: Implemented in `TransformerBuilder` to provide a flexible solution to various object creation
-  scenarios in the transformers.
-- **Singleton Pattern**: Applied in utility classes to ensure that only a single instance of a class is created,
-  providing a controlled access point to resources, such as configuration settings.
-- **Decorator Pattern**: Although not used in the current implementation, this pattern was considered for potential
-  future enhancements to add additional behaviors to transformers without modifying their code.
+Each module and class has a distinct responsibility:
 
-These patterns were chosen not only for their technical benefits but also to facilitate a deeper understanding of good
-design practices and their impact on maintainability and scalability.
+- **builder**: Constructs transformers using the Builder pattern.
+- **cli**: Manages user input and system output, serving as the system's entry point.
+- **concurrency**: Manages concurrent execution of tasks to enhance performance.
+- **delegation**: Delegates specific tasks to specialized classes for cleaner code.
+- **transformers**: Converts data between different formats.
+- **util**: Provides utility functions central to the application's operation.
+- **validators**: Checks the validity of the input data before processing.
+
+### Concurrency Management
+
+The DTS processes large data transformations concurrently, ensuring efficient use of system resources.
+The `ThreadPoolManager` oversees thread allocation and task execution, while the `DataProcessor` manages the data
+processing workflow.
+
+### Data Validation
+
+Before transforming data, the DTS validates input files using the appropriate `Validator`. This step ensures data
+correctness and format compliance, preventing processing errors down the line.
+
+### User Interface
+
+The CLI module provides a user-friendly interface for interacting with the DTS. Users are guided through the
+transformation process with clear instructions and feedback, simplifying the user experience.
+
+### Logging
+
+Logging is facilitated by SLF4J and Logback, providing insight into the system's operational state and aiding in
+debugging and monitoring. The system logs significant events and errors to both the console and external log files for
+review.
+
+### Testing
+
+Robust unit tests validate each component's functionality. The tests ensure that the system behaves as expected, even as
+new features are integrated.
+
+---
+
+By using these design patterns and organizing the project into clear modules, the DTS achieves a high degree of
+modularity and readability. This structure supports ongoing development and ensures the system can evolve to meet future
+requirements.
 
 
 # Maven Commands
@@ -125,14 +169,14 @@ mvn clean compile
 
 ## JUnit Tests
 
-JUnit is a popular testing framework for Java. JUnit tests are automated tests that are written to verify that the
+JUnit is a popular testing framework for Java. JUnit test are automated tests that are written to verify that the
 behavior of a piece of code is as expected.
 
 In JUnit, tests are written as methods within a test class. Each test method tests a specific aspect of the code and is
 annotated with the @Test annotation. JUnit provides a range of assertions that can be used to verify the behavior of the
 code being tested.
 
-JUnit tests are executed automatically and the results of the tests are reported. This allows developers to quickly and
+JUnit test are executed automatically and the results of the tests are reported. This allows developers to quickly and
 easily check if their code is working as expected, and make any necessary changes to fix any issues that are found.
 
 The use of JUnit tests is an important part of Test-Driven Development (TDD), where tests are written before the code
